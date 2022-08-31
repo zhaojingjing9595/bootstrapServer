@@ -10,20 +10,23 @@ import {
   FormLabel,
   Row,
 } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Loader from '../components/Loader';
 import { login, signUp } from '../services/api';
 
 function LoginPage({ currentUser, setCurrentUser }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showLogin, setShowLogin] = useState(true);
+  const [ showLogin, setShowLogin ] = useState(true);
+  let navigate = useNavigate();
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (showLogin) {
       try {
         const user = await login(username, password);
         user && setCurrentUser(user);
+        navigate('/')
       } catch (error) {
         console.log(error);
       }
@@ -31,6 +34,7 @@ function LoginPage({ currentUser, setCurrentUser }) {
       try {
         const user = await signUp(username, password);
         user && setCurrentUser(user);
+        navigate('/')
       } catch (error) {
         console.log(error);
       }
@@ -45,7 +49,7 @@ function LoginPage({ currentUser, setCurrentUser }) {
             <FormGroup controlId="username" className="mb-2">
               <FormLabel>Username</FormLabel>
               <FormControl
-                type="name"
+                type="username"
                 placeholder="Enter username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}

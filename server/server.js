@@ -3,6 +3,7 @@ import colors from 'colors'
 import dotenv from 'dotenv'
 import { connectDB } from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
+import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 
 app.use('/user', userRoutes)
 
-
+app.use(notFound);
+app.use(errorHandler)
 
 app.listen(PORT, console.log(`server is running on port ${PORT}...`.yellow.bold));
