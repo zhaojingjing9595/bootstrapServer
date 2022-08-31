@@ -25,7 +25,7 @@ export const signUp = async (username, password) => {
 
 export const ConnectToServer = async (connectionRequestObj) => {
   try {
-    const { data } = await axios.post('/connect-server', connectionRequestObj);
+    const { data } = await axios.post('/server-connect', connectionRequestObj);
     console.log(data);
     return data;
   } catch (error) {

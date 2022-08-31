@@ -9,32 +9,47 @@ import Server_Connection from './models/connectionModel.js';
 import User from './models/userModel.js';
 import { server_connection } from './data/server_connection.js';
 
-
 dotenv.config();
 
 connectDB();
 
-const importData = async () => { 
-    try {
-      // await Server.deleteMany();
-      // await License.deleteMany();
+const importData = async () => {
+  try {
+    // await Server.deleteMany();
+    // await Server.insertMany(servers_details);
+    
+    // await License.deleteMany();
+    // await License.insertMany(License_details);
 
-      // await Server.insertMany(servers_details);
-      // await License.insertMany(License_details);
+    // import server-connection data
+    await Server_Connection.deleteMany();
+    const user = await User.findOne({ Client_Id: 'Adam' });
+    const userId = user._id;
+    const newObj = {
+      User_id: userId,
+      Client_Id: 'Adam',
+      Location: 'Israel',
+      Server_Id: '22222',
+      Client_Capacity: 3,
+      License_Key: "5HFDD-ZPTAM-0OE4Z",
+      License_Expiration_Time: 2,
+      expireAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    };
+    const newConnections = server_connection.map((e) => ({
+      ...e,
+      User_id: userId,
+    }));
+      newConnections.push(newObj);
+    console.log(newConnections);
+    await Server_Connection.insertMany(newConnections);
 
-        await Server_Connection.deleteMany();
-        const user = await User.findOne({ Client_Id: "Adam" })
-        const userId = user._id
-        const newConnections = server_connection.map((e) => ({ ...e, User_id: userId }))
-        console.log(newConnections)
-      await Server_Connection.insertMany(newConnections);
+    console.log('Data Imported!'.green.inverse);
+    process.exit();
+  } catch (error) {
+    console.log(`Error: ${error}`.red.inverse);
+    process.exit(1);
+  }
+};
 
-      console.log('Data Imported!'.green.inverse);
-      process.exit();
-    } catch (error) {
-        console.log(`Error: ${error}`.red.inverse);
-        process.exit(1);
-    }
-}
 
 importData();

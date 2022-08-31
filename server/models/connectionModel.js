@@ -26,6 +26,7 @@ const serverConnectionSchema = mongoose.Schema(
     License_Key: {
       type: String,
       required: true,
+      unique:true
     },
     License_Expiration_Time: {
       type: Number,

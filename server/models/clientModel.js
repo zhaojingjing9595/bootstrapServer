@@ -10,7 +10,6 @@ const clientDetailsSchema = mongoose.Schema(
     Client_Id: {
       type: String,
       required: true,
-      unique: true,
     },
     Client_Password: {
       type: String,
