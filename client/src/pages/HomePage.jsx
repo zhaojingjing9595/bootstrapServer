@@ -9,13 +9,23 @@ import {
   FormLabel,
   Row,
 } from 'react-bootstrap';
+import { ConnectToServer } from '../services/api';
 
-function HomePage() {
+function HomePage({currentUser}) {
   const [licenseKey, setLicenseKey] = useState('');
   const [location, setLocation] = useState('');
 
-  const handleConnectToServer = (e) => {
-    e.preventDefault();
+  const handleConnectToServer = async(e) => {
+      e.preventDefault();
+      const connectionRequestObj = {
+          Client_Id: currentUser.Client_Id,
+          Client_Password: currentUser.Client_Password,
+          License_Key: licenseKey,
+          Location: location
+      }
+      const response = await ConnectToServer(connectionRequestObj);
+      console.log(response)
+      
   };
   return (
     <Container>
@@ -25,8 +35,8 @@ function HomePage() {
         </Col>
       </Row>
 
-      <Row className="justify-content-md-center my-3">
-        <Col lg={6} md={6} xs={12}>
+      { currentUser && <Row className="justify-content-md-center my-3">
+        <Col lg={6} md={10} xs={12}>
           <Form onSubmit={handleConnectToServer}>
             <Row>
               <Col>
@@ -61,7 +71,7 @@ function HomePage() {
             </Row>
           </Form>
         </Col>
-      </Row>
+      </Row>}
     </Container>
   );
 }

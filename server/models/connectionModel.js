@@ -10,7 +10,6 @@ const serverConnectionSchema = mongoose.Schema(
     Client_Id: {
       type: String,
       required: true,
-      unique: true,
     },
     Location: {
       type: String,
@@ -35,6 +34,7 @@ const serverConnectionSchema = mongoose.Schema(
     expireAt: {
       type: Date,
       required: true,
+      expires: 0,
     },
   },
   {
@@ -42,5 +42,8 @@ const serverConnectionSchema = mongoose.Schema(
   }
 );
 
-const Server_Connection = mongoose.model('Server_Connection', serverConnectionSchema);
+const Server_Connection = mongoose.model(
+  'Server_Connection',
+  serverConnectionSchema
+);
 export default Server_Connection;

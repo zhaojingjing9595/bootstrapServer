@@ -10,11 +10,11 @@ function App() {
   const [currentUser, setCurrentUser] = useState('');
   return (
     <div>
-      <Header />
+      <Header currentUser={currentUser} setCurrentUser={setCurrentUser} />
       <main className="py-3">
         <Container>
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<HomePage currentUser={currentUser} />} />
             <Route
               path="/login"
               element={
