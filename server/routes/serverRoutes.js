@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { connectToServer } from '../controller/serverController.js';
+import { connectToServer, getConnectionDetail } from '../controller/serverController.js';
 import { checkLicenseAvailability, checkLocationExist, checkServerCapacity } from '../middleware/serverMiddleware.js';
 
 const serverRoutes = Router();
@@ -11,6 +11,8 @@ serverRoutes
     checkLocationExist,
     checkServerCapacity,
     connectToServer
-  );
+);
+  
+serverRoutes.route('/:id').get(getConnectionDetail);
 
 export default serverRoutes;

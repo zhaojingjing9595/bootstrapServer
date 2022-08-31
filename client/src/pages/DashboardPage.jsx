@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -8,13 +8,17 @@ import {
   FormGroup,
   FormLabel,
   Row,
+  Table,
 } from 'react-bootstrap';
-import { ConnectToServer } from '../services/api';
+import { ConnectToServer, getConnectionDetail } from '../services/api';
 
 function DashboardPage({ currentUser }) {
   const [licenseKey, setLicenseKey] = useState('');
   const [location, setLocation] = useState('');
-
+  const [showMessage, setShowMessage] = useState(false);
+  const [connectionDetails, setConnectionDetails] = useState(null);
+    const [ clock, setClock ] = useState();
+    
   const handleConnectToServer = async (e) => {
     e.preventDefault();
     const connectionRequestObj = {
@@ -26,11 +30,44 @@ function DashboardPage({ currentUser }) {
     const newConnection = await ConnectToServer(connectionRequestObj);
     console.log(newConnection);
     if (newConnection) {
+        setConnectionDetails(newConnection);
+        setClock(newConnection.License_Expiration_Time*60);
+      setShowMessage(true);
     }
   };
+    
+    useEffect(() => { 
+        const fetchConnectionDetail = async (_id) => { 
+            const connection = await getConnectionDetail(_id);
+            if (connection) {
+              setConnectionDetails(connection);
+            }
+        }
+        const interval = setInterval(
+            () => {
+                if (connectionDetails) { 
+                    fetchConnectionDetail(connectionDetails._id);
+                    setClock((prev)=>prev-3)
+                }
+            },
+          3000
+        );
+
+        if (clock === 0) { 
+            clearInterval(interval);
+        }
+
+        return function cleanup() { 
+             clearInterval(interval);
+        }
+    },[clock, connectionDetails])
+    
+
+    
   return (
-    <div>
-      {currentUser && (
+      <div>
+          <h1>{clock}</h1>
+      {currentUser && !showMessage && (
         <Row className="justify-content-md-center my-3">
           <Col lg={6} md={10} xs={12}>
             <Form onSubmit={handleConnectToServer}>
@@ -67,11 +104,48 @@ function DashboardPage({ currentUser }) {
           </Col>
         </Row>
       )}
-      <Row className="justify-content-md-center my-3">
-        <Col lg={6} md={10} xs={12}>
-          <Alert variant="success">Connecting to Server successfully!</Alert>
-        </Col>
-      </Row>
+      {showMessage && (
+        <Row className="justify-content-md-center my-3">
+          <Col lg={6} md={10} xs={12}>
+            <Alert variant="success">Connecting to server successfully!</Alert>
+          </Col>
+        </Row>
+      )}
+      {connectionDetails && (
+        <>
+          <Row className="justify-content-center my-3">
+            <Col lg={10} xs={12}>
+              <h3>Server connection details:</h3>
+            </Col>
+          </Row>
+          <Row className="justify-content-center my-3">
+            <Col lg={10} xs={12}>
+              <Table striped bordered hover responsive size="sm">
+                <thead>
+                  <tr>
+                    <th>Client_Id</th>
+                    <th>License_Key</th>
+                    <th>License_Expiration_Time(Mins)</th>
+                    <th>Server_Id</th>
+                    <th>Clients_Capacity</th>
+                    <th>Location</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{connectionDetails.Client_Id}</td>
+                    <td>{connectionDetails.License_Key}</td>
+                    <td>{connectionDetails.License_Expiration_Time}</td>
+                    <td>{connectionDetails.Server_Id}</td>
+                    <td>{connectionDetails.Client_Capacity}</td>
+                    <td>{connectionDetails.Location}</td>
+                  </tr>
+                </tbody>
+              </Table>
+            </Col>
+          </Row>
+        </>
+      )}
     </div>
   );
 }

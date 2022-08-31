@@ -30,3 +30,13 @@ export const ConnectToServer = async (connectionRequestObj) => {
     console.log(error);
   }
 };
+
+export const getConnectionDetail = async (_id) => { 
+  try {
+    const { data } = await axios.get(`/server-connect/${_id}`);
+     return data;
+  } catch (error) {
+    console.log(error);
+  }
+
+}
