@@ -14,7 +14,7 @@ function App() {
       <main className="py-3">
         <Container>
           <Routes>
-            <Route path="/" element={<HomePage currentUser={currentUser} />} />
+            <Route path="/" element={<HomePage />} />
             <Route
               path="/login"
               element={
@@ -24,7 +24,10 @@ function App() {
                 />
               }
             />
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route
+              path="/dashboard"
+              element={<DashboardPage currentUser={currentUser} />}
+            />
           </Routes>
         </Container>
       </main>

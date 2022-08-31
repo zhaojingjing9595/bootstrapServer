@@ -5,7 +5,6 @@
 
 export const login = async (username, password) => {
   try {
-    console.log(username, password)
       const {data} = await axios.post('/user/login', { username, password });
       return data
   } catch (error) {
@@ -26,7 +25,6 @@ export const signUp = async (username, password) => {
 export const ConnectToServer = async (connectionRequestObj) => {
   try {
     const { data } = await axios.post('/server-connect', connectionRequestObj);
-    console.log(data);
     return data;
   } catch (error) {
     console.log(error);

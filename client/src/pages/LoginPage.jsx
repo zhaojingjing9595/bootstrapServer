@@ -26,7 +26,7 @@ function LoginPage({ currentUser, setCurrentUser }) {
       try {
         const user = await login(username, password);
         user && setCurrentUser(user);
-        navigate('/')
+        navigate('/dashboard')
       } catch (error) {
         console.log(error);
       }
@@ -34,7 +34,7 @@ function LoginPage({ currentUser, setCurrentUser }) {
       try {
         const user = await signUp(username, password);
         user && setCurrentUser(user);
-        navigate('/')
+        navigate('/dashboard')
       } catch (error) {
         console.log(error);
       }

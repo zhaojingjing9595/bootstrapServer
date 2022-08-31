@@ -47,7 +47,6 @@ export const checkServerCapacity = async (req, res, next) => {
         let sameServerId = activeConnections.filter(
           (x) => x.Server_Id === servers[i].Server_Id
         );
-        console.log(sameServerId);
         if (sameServerId.length < servers[i].Client_Capacity) {
             req.body.Server_Id = servers[i].Server_Id;
             break;
