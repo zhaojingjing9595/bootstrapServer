@@ -1,0 +1,3 @@
+.btn-link:active:focus, .btn-link:focus{
+  box-shadow: none;
+}
