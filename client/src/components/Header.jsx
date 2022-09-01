@@ -9,7 +9,8 @@ function Header() {
   
   const handleLogout = () => { 
     setCurrentUser(null);
-    localStorage.removeItem('currentUser')
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('license')
   }
     return (
       <header>

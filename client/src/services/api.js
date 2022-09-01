@@ -15,19 +15,11 @@ export const signUp = async (username, password) => {
 };
 
 export const ConnectToServer = async (connectionRequestObj) => {
-  try {
     const { data } = await axios.post('/server-connect', connectionRequestObj);
     return data;
-  } catch (error) {
-    console.log(error);
-  }
 };
 
 export const getConnectionDetail = async (licenseKey) => {
-  try {
     const { data } = await axios.get(`/server-connect/${licenseKey}`);
     return data;
-  } catch (error) {
-    console.log(error);
-  }
 };

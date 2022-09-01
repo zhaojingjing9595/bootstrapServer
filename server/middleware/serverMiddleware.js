@@ -15,7 +15,7 @@ export const checkLicenseAvailability = async (req, res, next) => {
       next();
     } else {
       res.status(401);
-      throw new Error('this license is not available');
+      throw new Error('This license key is not available!');
     }
   } catch (error) {
     next(error);
@@ -30,7 +30,7 @@ export const checkLocationExist = async (req, res, next) => {
       next();
     } else {
       res.status(401);
-      throw new Error('this location does not exist');
+      throw new Error('Servers on this location do not exist!');
     }
   } catch (error) {
     next(error);
@@ -56,7 +56,7 @@ export const checkServerCapacity = async (req, res, next) => {
           next();
       } else { 
            res.status(401);
-           throw new Error('the server capacity has reached its maximum');
+           throw new Error('Servers on this location has reached its maximum capacity!');
       }
   } catch (error) {
     next(error);

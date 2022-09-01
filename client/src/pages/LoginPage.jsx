@@ -14,7 +14,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import Loader from '../components/Loader';
 import AuthContext from '../contexts/AuthContext';
-import { login, signUp } from '../services/api';
+import { getConnectionDetail, login, signUp } from '../services/api';
 
 function LoginPage() {
   const { setCurrentUser } = useContext(AuthContext);
@@ -33,9 +33,22 @@ function LoginPage() {
       try {
         const user = await login(username, password);
         if (user) {
+          localStorage.setItem('currentUser', JSON.stringify(user));
           setCurrentUser(user);
           setIsLoading(false);
-          localStorage.setItem('currentUser', JSON.stringify(user));
+          const connection = await getConnectionDetail(user.Client_Id);
+          if (
+            connection.Client_Id &&
+            new Date(connection.expireAt).getTime() - Date.now() > 0
+          ) {
+            localStorage.setItem(
+              'license',
+              JSON.stringify({
+                licenseKey: connection.License_Key,
+                expireAt: connection.expireAt,
+              }))
+          }
+         
           navigate('/dashboard');
         }
       } catch (error) {

@@ -51,14 +51,14 @@ export const connectToServer = async (req, res, next) => {
 
 export const getConnectionDetail = async (req, res, next) => {
   try {
-    const connections = await Server_Connection.findOne({
-      License_Key: req.params.licenseKey,
-    });
-    if (connections) {
-      res.send(connections);
+    const connection = await Server_Connection.findOne({
+      Client_Id: req.params.Client_Id,
+    }).sort({created_at: -1});
+    if (connection) {
+      res.send(connection);
     } else {
-      res.status(401);
-      throw new Error('Fail to get the connection details');
+      res.send({});
+      // throw new Error('Fail to get the connection details');
     }
   } catch (error) {
     next(error);
