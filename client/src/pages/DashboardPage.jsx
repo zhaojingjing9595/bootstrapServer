@@ -19,10 +19,17 @@ function DashboardPage() {
   const { currentUser } = useContext(AuthContext);
   const [licenseKey, setLicenseKey] = useState('');
   const [location, setLocation] = useState('');
-  const [showMessage, setShowMessage] = useState(false);
   const [connectionDetails, setConnectionDetails] = useState(null);
-  const [clock, setClock] = useState(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
+  const [clock, setClock] = useState(
+    localStorage.license
+      ? Math.floor(
+          (new Date(JSON.parse(localStorage.license).expireAt).getTime() -
+            Date.now()) /
+            1000
+        )
+      : null
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -52,15 +59,6 @@ function DashboardPage() {
   useEffect(() => {
     if (localStorage.license) {
       fetchConnectionDetail(JSON.parse(localStorage.license).licenseKey);
-      setClock(
-        localStorage.license
-          ? Math.floor(
-              (new Date(JSON.parse(localStorage.license).expireAt).getTime() -
-                Date.now()) /
-                1000
-            )
-          : null
-      );
     }
   }, []);
 
@@ -82,11 +80,9 @@ function DashboardPage() {
       Location: location,
     };
     const newConnection = await ConnectToServer(connectionRequestObj);
-    console.log(newConnection);
-    if (newConnection.Server_Id) {
+    if (newConnection) {
       setConnectionDetails(newConnection);
       setClock(newConnection.License_Expiration_Time * 60);
-      setShowMessage(true);
       localStorage.setItem(
         'license',
         JSON.stringify({
@@ -156,7 +152,8 @@ function DashboardPage() {
           <Row className="justify-content-center my-3">
             <Col lg={10} xs={12}>
               <h3 style={{ textAlign: 'center' }}>
-                Expire after: {new Date(clock * 1000).toISOString().substr(11, 8)}
+                Expire after:{' '}
+                {new Date(clock * 1000).toISOString().substr(11, 8)}
               </h3>
             </Col>
           </Row>

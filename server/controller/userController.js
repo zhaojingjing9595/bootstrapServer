@@ -10,7 +10,8 @@ export const signUp = async (req, res, next) => {
     } else {
         const newUser = new User({ Client_Id: username, Client_Password: password });
         await newUser.save();
-        res.send(newUser)
+      res.send(newUser)
+      next();
     }
   } catch (error) {
     next(error);

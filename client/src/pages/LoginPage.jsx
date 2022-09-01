@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { useState } from 'react';
 import {
+  Alert,
   Button,
   Col,
   Container,
@@ -16,32 +17,43 @@ import AuthContext from '../contexts/AuthContext';
 import { login, signUp } from '../services/api';
 
 function LoginPage() {
-
   const { setCurrentUser } = useContext(AuthContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [ showLogin, setShowLogin ] = useState(true);
+  const [showLogin, setShowLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   let navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
     if (showLogin) {
       try {
         const user = await login(username, password);
-        user && setCurrentUser(user);
-        localStorage.setItem('currentUser', JSON.stringify(user))
-        navigate('/dashboard')
+        if (user) {
+          setCurrentUser(user);
+          setIsLoading(false);
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          navigate('/dashboard');
+        }
       } catch (error) {
-        console.log(error);
+        setError(error.response.data.message);
+        setIsLoading(false);
       }
     } else {
       try {
         const user = await signUp(username, password);
-        user && setCurrentUser(user);
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        navigate('/dashboard')
+        if (user) {
+          setCurrentUser(user);
+          setIsLoading(false);
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          navigate('/dashboard');
+        }
       } catch (error) {
-        console.log(error);
+        setError(error.response.data.message);
+        setIsLoading(false);
       }
     }
   };
@@ -50,6 +62,8 @@ function LoginPage() {
       <Row className="justify-content-md-center">
         <Col lg={4} md={6} xs={12}>
           {showLogin ? <h1>Login</h1> : <h1>Register</h1>}
+          {error && <Alert variant="danger">{error}</Alert>}
+          {isLoading && <Loader />}
           <Form onSubmit={handleLogin}>
             <FormGroup controlId="username" className="mb-2">
               <FormLabel>Username</FormLabel>
@@ -69,7 +83,6 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
               ></FormControl>
             </FormGroup>
-
             {showLogin ? (
               <Button className="my-2" type="submit">
                 Sign In
@@ -84,14 +97,26 @@ function LoginPage() {
             {showLogin ? (
               <Col>
                 New Customer?
-                <Button variant="link" onClick={() => setShowLogin(false)}>
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    setShowLogin(false);
+                    setError('');
+                  }}
+                >
                   Register here
                 </Button>
               </Col>
             ) : (
               <Col>
                 Already have an account?
-                <Button variant="link" onClick={() => setShowLogin(true)}>
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    setShowLogin(true);
+                    setError('');
+                  }}
+                >
                   Login here
                 </Button>
               </Col>
