@@ -1,9 +1,15 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Container, Nav, Navbar } from 'react-bootstrap';
-function Header({ currentUser, setCurrentUser }) {
+import { useContext } from 'react';
+import AuthContext from '../contexts/AuthContext';
+
+function Header() {
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  
   const handleLogout = () => { 
     setCurrentUser(null);
+    localStorage.removeItem('currentUser')
   }
     return (
       <header>
@@ -15,17 +21,19 @@ function Header({ currentUser, setCurrentUser }) {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="ms-auto">
-                <LinkContainer to={`/dashboard`}>
-                  <Nav.Link>
-                    <i className="fas fa-table"></i> Dashboard
-                  </Nav.Link>
-                </LinkContainer>
                 {currentUser ? (
-                  <LinkContainer to={'/'}>
-                    <Nav.Link onClick={handleLogout}>
-                      <i className="fas fa-sign-out"></i> Logout
-                    </Nav.Link>
-                  </LinkContainer>
+                  <>
+                    <LinkContainer to={`/dashboard`}>
+                      <Nav.Link>
+                        <i className="fas fa-table"></i> Dashboard
+                      </Nav.Link>
+                    </LinkContainer>
+                    <LinkContainer to={'/'}>
+                      <Nav.Link onClick={handleLogout}>
+                        <i className="fas fa-sign-out"></i> Logout
+                      </Nav.Link>
+                    </LinkContainer>
+                  </>
                 ) : (
                   <LinkContainer to={'/login'}>
                     <Nav.Link>

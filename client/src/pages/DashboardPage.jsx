@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useContext } from 'react';
 import {
   Alert,
   Button,
@@ -10,9 +11,11 @@ import {
   Row,
   Table,
 } from 'react-bootstrap';
+import AuthContext from '../contexts/AuthContext';
 import { ConnectToServer, getConnectionDetail } from '../services/api';
 
-function DashboardPage({ currentUser }) {
+function DashboardPage() {
+    const {currentUser} = useContext(AuthContext)
   const [licenseKey, setLicenseKey] = useState('');
   const [location, setLocation] = useState('');
   const [showMessage, setShowMessage] = useState(false);
@@ -54,19 +57,20 @@ function DashboardPage({ currentUser }) {
         );
 
         if (clock === 0) { 
+            console.log('cleaning up')
             clearInterval(interval);
         }
 
         return function cleanup() { 
-             clearInterval(interval);
+            clearInterval(interval);
         }
-    },[clock, connectionDetails])
+    },[clock])
     
 
     
   return (
       <div>
-          <h1>{clock}</h1>
+          {clock && <h1>{clock}</h1>}
       {currentUser && !showMessage && (
         <Row className="justify-content-md-center my-3">
           <Col lg={6} md={10} xs={12}>

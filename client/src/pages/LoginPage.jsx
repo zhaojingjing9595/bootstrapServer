@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useState } from 'react';
 import {
   Button,
@@ -12,9 +12,12 @@ import {
 } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import Loader from '../components/Loader';
+import AuthContext from '../contexts/AuthContext';
 import { login, signUp } from '../services/api';
 
-function LoginPage({ currentUser, setCurrentUser }) {
+function LoginPage() {
+
+  const { setCurrentUser } = useContext(AuthContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [ showLogin, setShowLogin ] = useState(true);
@@ -26,6 +29,7 @@ function LoginPage({ currentUser, setCurrentUser }) {
       try {
         const user = await login(username, password);
         user && setCurrentUser(user);
+        localStorage.setItem('currentUser', JSON.stringify(user))
         navigate('/dashboard')
       } catch (error) {
         console.log(error);
@@ -34,6 +38,7 @@ function LoginPage({ currentUser, setCurrentUser }) {
       try {
         const user = await signUp(username, password);
         user && setCurrentUser(user);
+        localStorage.setItem('currentUser', JSON.stringify(user));
         navigate('/dashboard')
       } catch (error) {
         console.log(error);
