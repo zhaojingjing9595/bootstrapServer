@@ -97,8 +97,6 @@ function DashboardPage() {
     }
   };
 
-  console.log(clock);
-  console.log(connectionDetails);
   return (
     <div>
       {currentUser && !clock && (
@@ -158,7 +156,7 @@ function DashboardPage() {
           <Row className="justify-content-center my-3">
             <Col lg={10} xs={12}>
               <h3 style={{ textAlign: 'center' }}>
-                Expire after: {clock} seconds
+                Expire after: {new Date(clock * 1000).toISOString().substr(11, 8)}
               </h3>
             </Col>
           </Row>

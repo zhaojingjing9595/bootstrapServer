@@ -5,7 +5,6 @@ const serverConnectionSchema = mongoose.Schema(
     Client_Id: {
       type: String,
       required: true,
-      unique:true,
     },
     Location: {
       type: String,
