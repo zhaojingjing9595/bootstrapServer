@@ -13,6 +13,6 @@ serverRoutes
     connectToServer
 );
   
-serverRoutes.route('/:id').get(getConnectionDetail);
+serverRoutes.route('/:licenseKey').get(getConnectionDetail);
 
 export default serverRoutes;

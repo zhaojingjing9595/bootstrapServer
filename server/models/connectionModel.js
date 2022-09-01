@@ -2,14 +2,10 @@ import mongoose from 'mongoose';
 
 const serverConnectionSchema = mongoose.Schema(
   {
-    User_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: 'User',
-    },
     Client_Id: {
       type: String,
       required: true,
+      unique:true,
     },
     Location: {
       type: String,

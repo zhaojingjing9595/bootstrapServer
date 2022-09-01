@@ -10,7 +10,6 @@ export const connectToServer = async (req, res, next) => {
     const server = await Server.findOne({ Server_Id: req.body.Server_Id });
     //   save new server_connection into DB
     const newConnectionObj = new Server_Connection({
-      User_id: user._id,
       Client_Id: req.body.Client_Id,
       Location: req.body.Location,
       Server_Id: req.body.Server_Id,
@@ -49,12 +48,14 @@ export const connectToServer = async (req, res, next) => {
   }
 };
 
+
 export const getConnectionDetail = async (req, res, next) => {
   try {
-    const connection = await Server_Connection.findOne({_id:  req.params.id });
-    if (connection) {
-      res.send(connection);
-      next();
+    const connections = await Server_Connection.findOne({
+      License_Key: req.params.licenseKey,
+    });
+    if (connections) {
+      res.send(connections);
     } else {
       res.status(401);
       throw new Error('Fail to get the connection details');

@@ -11,17 +11,68 @@ import {
   Row,
   Table,
 } from 'react-bootstrap';
+import AlertModal from '../components/AlertModal';
 import AuthContext from '../contexts/AuthContext';
 import { ConnectToServer, getConnectionDetail } from '../services/api';
 
 function DashboardPage() {
-    const {currentUser} = useContext(AuthContext)
+  const { currentUser } = useContext(AuthContext);
   const [licenseKey, setLicenseKey] = useState('');
   const [location, setLocation] = useState('');
   const [showMessage, setShowMessage] = useState(false);
   const [connectionDetails, setConnectionDetails] = useState(null);
-    const [ clock, setClock ] = useState();
-    
+  const [clock, setClock] = useState(null);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (localStorage.license) {
+        setClock((prev) => prev - 1);
+        fetchConnectionDetail(JSON.parse(localStorage.license).licenseKey);
+      }
+    }, 1000);
+
+    if (clock === 0) {
+      console.log('cleaning up');
+      setShowAlertModal(true);
+      setClock(null);
+      localStorage.removeItem('license');
+      setConnectionDetails(null);
+      setLicenseKey('');
+      setLocation('');
+      clearInterval(interval);
+    }
+
+    return function cleanup() {
+      clearInterval(interval);
+    };
+  }, [clock]);
+
+  // refresh onMount:
+  useEffect(() => {
+    if (localStorage.license) {
+      fetchConnectionDetail(JSON.parse(localStorage.license).licenseKey);
+      setClock(
+        localStorage.license
+          ? Math.floor(
+              (new Date(JSON.parse(localStorage.license).expireAt).getTime() -
+                Date.now()) /
+                1000
+            )
+          : null
+      );
+    }
+  }, []);
+
+  const fetchConnectionDetail = async (licenseKey) => {
+    const connection = await getConnectionDetail(licenseKey);
+    if (connection) {
+      setConnectionDetails(connection);
+    } else {
+      setConnectionDetails(null);
+    }
+  };
+
   const handleConnectToServer = async (e) => {
     e.preventDefault();
     const connectionRequestObj = {
@@ -32,46 +83,25 @@ function DashboardPage() {
     };
     const newConnection = await ConnectToServer(connectionRequestObj);
     console.log(newConnection);
-    if (newConnection) {
-        setConnectionDetails(newConnection);
-        setClock(newConnection.License_Expiration_Time*60);
+    if (newConnection.Server_Id) {
+      setConnectionDetails(newConnection);
+      setClock(newConnection.License_Expiration_Time * 60);
       setShowMessage(true);
+      localStorage.setItem(
+        'license',
+        JSON.stringify({
+          licenseKey: newConnection.License_Key,
+          expireAt: newConnection.expireAt,
+        })
+      );
     }
   };
-    
-    useEffect(() => { 
-        const fetchConnectionDetail = async (_id) => { 
-            const connection = await getConnectionDetail(_id);
-            if (connection) {
-              setConnectionDetails(connection);
-            }
-        }
-        const interval = setInterval(
-            () => {
-                if (connectionDetails) { 
-                    fetchConnectionDetail(connectionDetails._id);
-                    setClock((prev)=>prev-3)
-                }
-            },
-          3000
-        );
 
-        if (clock === 0) { 
-            console.log('cleaning up')
-            clearInterval(interval);
-        }
-
-        return function cleanup() { 
-            clearInterval(interval);
-        }
-    },[clock])
-    
-
-    
+  console.log(clock);
+  console.log(connectionDetails);
   return (
-      <div>
-          {clock && <h1>{clock}</h1>}
-      {currentUser && !showMessage && (
+    <div>
+      {currentUser && !clock && (
         <Row className="justify-content-md-center my-3">
           <Col lg={6} md={10} xs={12}>
             <Form onSubmit={handleConnectToServer}>
@@ -108,18 +138,33 @@ function DashboardPage() {
           </Col>
         </Row>
       )}
-      {showMessage && (
-        <Row className="justify-content-md-center my-3">
-          <Col lg={6} md={10} xs={12}>
-            <Alert variant="success">Connecting to server successfully!</Alert>
-          </Col>
-        </Row>
+      {showAlertModal && (
+        <AlertModal
+          show={showAlertModal}
+          onHide={() => setShowAlertModal(false)}
+        />
       )}
-      {connectionDetails && (
+
+      {clock && connectionDetails && (
         <>
+          <Row className="justify-content-md-center my-3">
+            <Col lg={6} md={10} xs={12}>
+              <Alert variant="success">
+                Connecting to server successfully!
+              </Alert>
+            </Col>
+          </Row>
+
           <Row className="justify-content-center my-3">
             <Col lg={10} xs={12}>
-              <h3>Server connection details:</h3>
+              <h3 style={{ textAlign: 'center' }}>
+                Expire after: {clock} seconds
+              </h3>
+            </Col>
+          </Row>
+          <Row className="justify-content-center my-3">
+            <Col lg={10} xs={12}>
+              <h5>Server connection details:</h5>
             </Col>
           </Row>
           <Row className="justify-content-center my-3">
@@ -129,7 +174,7 @@ function DashboardPage() {
                   <tr>
                     <th>Client_Id</th>
                     <th>License_Key</th>
-                    <th>License_Expiration_Time(Mins)</th>
+                    <th>Expiration_Time(min)</th>
                     <th>Server_Id</th>
                     <th>Clients_Capacity</th>
                     <th>Location</th>

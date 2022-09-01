@@ -23,10 +23,7 @@ const importData = async () => {
 
     // import server-connection data
     await Server_Connection.deleteMany();
-    const user = await User.findOne({ Client_Id: 'Adam' });
-    const userId = user._id;
     const newObj = {
-      User_id: userId,
       Client_Id: 'Adam',
       Location: 'Israel',
       Server_Id: '22222',
@@ -35,10 +32,6 @@ const importData = async () => {
       License_Expiration_Time: 2,
       expireAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     };
-    const newConnections = server_connection.map((e) => ({
-      ...e,
-      User_id: userId,
-    }));
       newConnections.push(newObj);
     console.log(newConnections);
     await Server_Connection.insertMany(newConnections);

@@ -31,13 +31,11 @@ export const ConnectToServer = async (connectionRequestObj) => {
   }
 };
 
-export const getConnectionDetail = async (_id) => { 
+export const getConnectionDetail = async (licenseKey) => {
   try {
-    const { data } = await axios.get(`/server-connect/${_id}`);
-    console.log(data)
-     return data;
+    const { data } = await axios.get(`/server-connect/${licenseKey}`);
+    return data;
   } catch (error) {
     console.log(error);
   }
-
-}
+};
