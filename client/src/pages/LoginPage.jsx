@@ -36,11 +36,13 @@ function LoginPage() {
           localStorage.setItem('currentUser', JSON.stringify(user));
           setCurrentUser(user);
           setIsLoading(false);
+          // fetch connection
           const connection = await getConnectionDetail(user.Client_Id);
           if (
             connection.Client_Id &&
             new Date(connection.expireAt).getTime() - Date.now() > 0
           ) {
+            // if there's a connection, save license to localStorage
             localStorage.setItem(
               'license',
               JSON.stringify({

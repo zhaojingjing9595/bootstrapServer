@@ -52,6 +52,7 @@ function DashboardPage() {
       setConnectionDetails(null);
       setLicenseKey('');
       setLocation('');
+      localStorage.removeItem('license')
     }
 
     return function cleanup() {
@@ -72,13 +73,6 @@ function DashboardPage() {
     const connection = await getConnectionDetail(Client_Id);
     if (connection.Client_Id) {
       setConnectionDetails(connection);
-      localStorage.setItem(
-        'license',
-        JSON.stringify({
-          licenseKey: connection.License_Key,
-          expireAt: connection.expireAt,
-        })
-      );
     } else {
       setConnectionDetails(null);
     }
