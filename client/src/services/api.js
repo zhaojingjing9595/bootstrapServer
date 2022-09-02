@@ -10,7 +10,6 @@ export const login = async (username, password) => {
 
 export const signUp = async (username, password) => {
     const { data } = await axios.post('/user/signup', { username, password });
-    console.log(data);
     return data;
 };
 

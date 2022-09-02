@@ -53,7 +53,7 @@ export const getConnectionDetail = async (req, res, next) => {
   try {
     const connection = await Server_Connection.findOne({
       Client_Id: req.params.Client_Id,
-    }).sort({created_at: -1});
+    }).sort({createdAt: -1});
     if (connection) {
       res.send(connection);
     } else {

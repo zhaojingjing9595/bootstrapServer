@@ -46,7 +46,6 @@ function DashboardPage() {
     }, 1000);
 
     if (clock === 0) {
-      console.log('cleaning up');
       clearInterval(interval);
       setShowAlertModal(true);
       setConnectionDetails(null);
@@ -110,8 +109,8 @@ function DashboardPage() {
     }
   };
 
-  console.log(clock);
-  console.log(connectionDetails);
+  // console.log(clock);
+  // console.log(connectionDetails);
   
   
   
