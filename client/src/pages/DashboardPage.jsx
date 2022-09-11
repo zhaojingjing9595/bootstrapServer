@@ -12,6 +12,7 @@ import {
   Table,
 } from 'react-bootstrap';
 import AlertModal from '../components/AlertModal';
+import Loader from '../components/Loader';
 import AuthContext from '../contexts/AuthContext';
 import { ConnectToServer, getConnectionDetail } from '../services/api';
 
@@ -21,11 +22,12 @@ function DashboardPage() {
   const [location, setLocation] = useState('');
   const [connectionDetails, setConnectionDetails] = useState(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
-  const [error, setError] = useState('');
+  const [ error, setError ] = useState('');
+  const [ isLoading, setIsLoading ] = useState(false);
   const [clock, setClock] = useState(
     localStorage.license
       ? Math.floor(
-          ((new Date(JSON.parse(localStorage.license).expireAt)).getTime() -
+          (new Date(JSON.parse(localStorage.license).expireAt).getTime() -
             Date.now()) /
             1000
         )
@@ -51,7 +53,7 @@ function DashboardPage() {
       setConnectionDetails(null);
       setLicenseKey('');
       setLocation('');
-      localStorage.removeItem('license')
+      localStorage.removeItem('license');
     }
 
     return function cleanup() {
@@ -59,12 +61,20 @@ function DashboardPage() {
     };
   }, [clock]);
 
+
   // refresh onMount:
   useEffect(() => {
-    if (localStorage.currentUser && localStorage.license &&
-        new Date(JSON.parse(localStorage.license).expireAt).getTime() -
-          Date.now() >0 ) {
+    if (
+      localStorage.currentUser &&
+      localStorage.license &&
+      new Date(JSON.parse(localStorage.license).expireAt).getTime() -
+        Date.now() >
+        0
+    ) {
       fetchConnectionDetail(JSON.parse(localStorage.currentUser).Client_Id);
+    } else {
+      localStorage.removeItem('license');
+      setConnectionDetails(null);
     }
   }, []);
 
@@ -79,6 +89,8 @@ function DashboardPage() {
 
   const handleConnectToServer = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('')
     const connectionRequestObj = {
       Client_Id: currentUser.Client_Id,
       Client_Password: currentUser.Client_Password,
@@ -89,31 +101,29 @@ function DashboardPage() {
       const newConnection = await ConnectToServer(connectionRequestObj);
       if (newConnection) {
         setConnectionDetails(newConnection);
+        setIsLoading(false)
         localStorage.setItem(
           'license',
           JSON.stringify({
             licenseKey: newConnection.License_Key,
             expireAt: newConnection.expireAt,
           })
-          );
-          setClock(
-            Math.floor(
-              (new Date(newConnection.expireAt).getTime() -
-                Date.now()) /
-                1000
-            )
-          );
+        );
+        setClock(
+          Math.floor(
+            (new Date(newConnection.expireAt).getTime() - Date.now()) / 1000
+          )
+        );
       }
     } catch (error) {
       setError(error.response.data.message);
+      setIsLoading(false)
     }
   };
 
   // console.log(clock);
   // console.log(connectionDetails);
-  
-  
-  
+
   return (
     <div>
       {currentUser && !clock && (
@@ -128,7 +138,10 @@ function DashboardPage() {
                       type="text"
                       placeholder="Enter License key"
                       value={licenseKey}
-                      onChange={(e) => setLicenseKey(e.target.value)}
+                      onChange={(e) => {
+                        setLicenseKey(e.target.value);
+                        setError(null);
+                      }}
                     ></FormControl>
                   </FormGroup>
                 </Col>
@@ -139,7 +152,9 @@ function DashboardPage() {
                       type="text"
                       placeholder="Enter Location"
                       value={location}
-                      onChange={(e) => setLocation(e.target.value)}
+                      onChange={(e) => {
+                        setLocation(e.target.value);
+                      setError(null)}}
                     ></FormControl>
                   </FormGroup>
                 </Col>
@@ -150,6 +165,7 @@ function DashboardPage() {
                 </Col>
               </Row>
               {error && <Alert variant="danger">{error}</Alert>}
+              {isLoading && <Loader />}
             </Form>
           </Col>
         </Row>
@@ -158,11 +174,14 @@ function DashboardPage() {
       {showAlertModal && (
         <AlertModal
           show={showAlertModal}
-          onHide={() => { setShowAlertModal(false);  localStorage.removeItem('license')}}
+          onHide={() => {
+            setShowAlertModal(false);
+            localStorage.removeItem('license');
+          }}
         />
       )}
 
-      { connectionDetails && clock!==0 && clock!==null && (
+      {connectionDetails && clock !== 0 && clock !== null && (
         <>
           <Row className="justify-content-md-center my-3">
             <Col lg={6} md={10} xs={12}>

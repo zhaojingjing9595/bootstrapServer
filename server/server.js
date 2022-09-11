@@ -1,6 +1,7 @@
 import express from 'express';
 import colors from 'colors'
 import dotenv from 'dotenv'
+import cors from 'cors'
 import { connectDB } from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import serverRoutes from './routes/serverRoutes.js';
@@ -13,6 +14,7 @@ connectDB();
 const app = new express();
 const PORT = process.env.PORT || 8000;
 
+app.use(cors())
 app.use(express.json())
 
 app.get('/', (req, res) => { 
